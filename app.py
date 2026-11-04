@@ -9,6 +9,17 @@ from trading_strategy import (
     implement_strategy,
 )
 
+from database import (
+    add_to_watchlist,
+    add_query_history,
+    get_query_history,
+    get_watchlist,
+    init_db,
+    remove_from_watchlist,
+)
+
+init_db()  
+
 
 st.set_page_config(page_title="MSFT Trading Strategy", page_icon="📈", layout="wide")
 
@@ -151,13 +162,68 @@ def show_detailed_trades(positions):
     st.dataframe(display, hide_index=True, width="stretch")
 
 
+def show_query_history():
+    st.subheader("Recent query history")
+    history = get_query_history(30)
+    if history.empty:
+        st.info("No query history is available yet.")
+        return
+
+    display = history.rename(
+        columns={
+            "id": "ID",
+            "symbol": "Symbol",
+            "queried_at": "Queried at",
+            "note": "Note",
+        }
+    )
+    st.dataframe(display, hide_index=True, width="stretch")
+
+
 st.title("MSFT Golden-Cross Strategy")
 st.caption("Five-year moving-average backtest")
 
 page = st.sidebar.radio(
     "Page",
-    ["Price chart", "Trade statistics", "Detailed trades"],
+    ["Price chart", "Trade statistics", "Detailed trades", "Query history"],
 )
+
+st.sidebar.divider()
+st.sidebar.header("🌟 My Watchlist")
+new_symbol = st.sidebar.text_input(
+    "Add stock symbol",
+    placeholder="e.g. AAPL",
+    key="watchlist_symbol_input",
+)
+if st.sidebar.button("Add", key="add_watchlist_symbol"):
+    symbol = new_symbol.strip().upper()
+    if not symbol:
+        st.sidebar.warning("Enter a stock symbol.")
+    else:
+        watchlist = get_watchlist()
+        if watchlist["symbol"].str.upper().eq(symbol).any():
+            st.sidebar.info(f"{symbol} is already in your watchlist.")
+        else:
+            add_to_watchlist(symbol)
+            st.sidebar.success(f"Added {symbol}")
+
+watchlist = get_watchlist()
+if watchlist.empty:
+    st.sidebar.caption("Your watchlist is empty.")
+else:
+    watchlist_display = watchlist[["symbol", "added_at"]].rename(
+        columns={"symbol": "Symbol", "added_at": "Added at"}
+    )
+    st.sidebar.dataframe(watchlist_display, hide_index=True, width="stretch")
+    symbol_to_remove = st.sidebar.selectbox(
+        "Select a symbol to remove",
+        watchlist["symbol"].tolist(),
+        key="watchlist_symbol_to_remove",
+    )
+    if st.sidebar.button("Remove", key="remove_watchlist_symbol"):
+        remove_from_watchlist(symbol_to_remove)
+        st.rerun()
+
 st.sidebar.divider()
 st.sidebar.markdown(
     "**Strategy**  \n"
@@ -169,7 +235,13 @@ data, positions = load_results()
 
 if page == "Price chart":
     show_price_chart(data, positions)
+    if st.session_state.get("last_page") != page:
+        add_query_history("MSFT", note="Viewed MSFT price chart")
 elif page == "Trade statistics":
     show_trade_statistics(positions)
-else:
+elif page == "Detailed trades":
     show_detailed_trades(positions)
+else:
+    show_query_history()
+
+st.session_state["last_page"] = page
