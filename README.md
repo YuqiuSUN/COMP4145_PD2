@@ -14,6 +14,8 @@ A Streamlit dashboard that backtests simple trading strategies on individual sto
 - **Detailed trades:** entry and exit dates and prices, holding days, profit, and sell reason for every simulated trade.
 - **My watchlist:** validated symbol entry, real-time quotes with color-coded daily changes, one-click backtesting, and inline removal. The list is persisted in SQLite and protected by a unique constraint.
 - **Query history:** every page visit is logged together with the page name and strategy type.
+- **Single-stock risk analysis:** select a Watchlist stock to review annualized volatility, maximum drawdown, S&P 500 beta, annualized downside risk, historical 95% one-day VaR, and a historical drawdown chart over five years.
+- **Risk rating:** green when volatility is ≤20% and drawdown is ≥-20%; yellow when neither exceeds the medium-risk limits (40% volatility and -40% drawdown) and at least one exceeds its low-risk limit; red when either exceeds a medium-risk limit. The higher of the two individual risk levels is used.
 
 ## Project structure
 
@@ -43,6 +45,14 @@ streamlit run app.py
 The dashboard loads MSFT by default and caches downloaded data for one hour.
 
 ## Changelog
+### v5.0 — Single-Stock Risk Analysis
+
+**Risk Analysis**
+- Added support to select one stock from the Watchlist for standalone risk evaluation.
+- Added calculation of single-stock risk metrics: annualized volatility, maximum drawdown, beta versus S&P 500, 95% 1-day Value at Risk, and annualized downside risk.
+- Added a traffic-light risk rating system (green/yellow/red) based on volatility and maximum drawdown.
+- Added a historical drawdown chart that marks the maximum drawdown period of the selected stock.
+
 ### v4.0 — Portfolio analysis
 
 **Portfolio analysis**

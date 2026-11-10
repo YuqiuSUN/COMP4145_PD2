@@ -22,6 +22,7 @@ from database import (
     remove_from_watchlist,
 )
 from portfolio import show_portfolio_page
+from risk_analysis import show_risk_analysis_page
 
 DOUBLE_MA_STRATEGY = "Double Moving Average Crossover"
 MOMENTUM_STRATEGY = "Momentum Breakout"
@@ -460,11 +461,23 @@ page = st.sidebar.radio(
         "Detailed trades",
         "Query history",
         "Portfolio Analysis",
+        "Single Stock Risk Analysis",
     ],
 )
 
 if page == "Portfolio Analysis":
     show_portfolio_page(watchlist["symbol"].tolist())
+    st.stop()
+elif page == "Single Stock Risk Analysis":
+    risk_symbol = show_risk_analysis_page(watchlist["symbol"].tolist())
+    if risk_symbol:
+        view_key = f"{risk_symbol}:{page}"
+        if st.session_state.get("last_view") != view_key:
+            add_query_history(
+                risk_symbol,
+                note=f"Viewed {page} for {risk_symbol}",
+            )
+        st.session_state["last_view"] = view_key
     st.stop()
 
 st.sidebar.divider()
