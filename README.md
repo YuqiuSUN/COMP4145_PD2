@@ -43,6 +43,18 @@ streamlit run app.py
 The dashboard loads MSFT by default and caches downloaded data for one hour.
 
 ## Changelog
+### v4.0 — Portfolio analysis
+
+**Portfolio analysis**
+
+- Added a Portfolio Analysis page that lets users select 2–20 US stocks from their Watchlist and choose a 1-month, 3-month, or 1-year analysis period.
+- Added portfolio return calculations using adjusted closing prices. The portfolio starts with equal investments in each stock and is held without rebalancing.
+- Added a total return summary, a cumulative return chart, an ending allocation pie chart, and a table showing each stock’s return and ending weight.
+- Added clear messages for invalid selections, missing stock data, and insufficient common trading dates.
+
+**Chart compatibility**
+
+- Fixed five Altair chart calls across `app.py` and `portfolio.py` to use `use_container_width=True` with Streamlit 1.50.0.
 
 ### v3.0 — Robustness and polish
 
