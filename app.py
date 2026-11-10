@@ -21,6 +21,7 @@ from database import (
     init_db,
     remove_from_watchlist,
 )
+from portfolio import show_portfolio_page
 
 DOUBLE_MA_STRATEGY = "Double Moving Average Crossover"
 MOMENTUM_STRATEGY = "Momentum Breakout"
@@ -194,7 +195,9 @@ def show_price_chart(
         )
         chart = alt.layer(lines, points).resolve_scale(color="independent")
 
-    st.altair_chart(chart.properties(height=520).interactive(), width="stretch")
+    st.altair_chart(
+        chart.properties(height=520).interactive(), use_container_width=True
+    )
 
 
 def show_equity_chart(data):
@@ -228,7 +231,7 @@ def show_equity_chart(data):
         .properties(height=360)
         .interactive()
     )
-    st.altair_chart(chart, width="stretch")
+    st.altair_chart(chart, use_container_width=True)
 
 
 def show_drawdown_chart(data):
@@ -250,7 +253,7 @@ def show_drawdown_chart(data):
         .properties(height=280)
         .interactive()
     )
-    st.altair_chart(chart, width="stretch")
+    st.altair_chart(chart, use_container_width=True)
 
 
 def show_trade_statistics(summary):
@@ -456,8 +459,13 @@ page = st.sidebar.radio(
         "Trade statistics",
         "Detailed trades",
         "Query history",
+        "Portfolio Analysis",
     ],
 )
+
+if page == "Portfolio Analysis":
+    show_portfolio_page(watchlist["symbol"].tolist())
+    st.stop()
 
 st.sidebar.divider()
 if strategy_type == DOUBLE_MA_STRATEGY:
